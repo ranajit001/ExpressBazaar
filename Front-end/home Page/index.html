@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpressBazaar  - Online Shopping</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="top-header">
+            <a href="#" class="logo">Express <span>Bazaar </span></a>
+            <div class="search-bar">
+                <input type="text" placeholder="Search for products, brands and more">
+                <button>Search</button>
+            </div>
+            <div class="user-actions">
+                <a href="#">Login</a>
+                <a href="#">Cart</a>
+            </div>
+        </div>
+        <nav>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Electronics</a>
+                <a href="#">Fashion</a>
+                <a href="#">Home & Kitchen</a>
+                <a href="#">Books</a>
+                <a href="#">Sports & Outdoors</a>
+                <a href="#">Beauty</a>
+                <a href="#">Toys & Games</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-image">
+            <img src="./images/hero.jpg" alt="Hero Banner" style="width:100%; height:100%; object-fit:cover;">
+        </div>
+        <div class="hero-content">
+            <h2>Great Deals on Top Brands</h2>
+            <button>Shop Now</button>
+        </div>
+    </section>
+
+
+    <!-- Products Section -->
+    <section class="products-container">
+        <h2 class="section-title">Featured Products</h2>
+        <div class="products-grid" id="featured-products">
+            <!-- Products will be dynamically added here -->
+        </div>
+    </section>
+
+
+    <!-- Trending Products Section -->
+    <section class="products-container">
+        <h2 class="section-title">Trending Products</h2>
+        <div class="products-grid" id="trending-products">
+            <!-- Products will be dynamically added here -->
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Get to Know Us</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press Releases</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Make Money with Us</h3>
+                <ul>
+                    <li><a href="#">Sell on ExpressBazaar</a></li>
+                    <li><a href="#">Become an Affiliate</a></li>
+                    <li><a href="#">Advertise Your Products</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Customer Service</h3>
+                <ul>
+                    <li><a href="#">Returns & Replacements</a></li>
+                    <li><a href="#">Shipping Rates & Policies</a></li>
+                    <li><a href="#">Help Center</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 ExpressBazaar. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data - You can replace this with your API calls later
+        const featuredProducts = [
+        {
+                id: 1,
+                title: "Sony PlayStation5 Gaming Console (Slim)",
+                price: 79.99,
+                rating: 4.5,
+                image: "https://m.media-amazon.com/images/I/51ljnEaW0pL._SX522_.jpg",
+                Featured:true
+            },    
+        {
+                id: 1,
+                title: "Lava Blaze 2 5G (Glass Blue, 6GB RAM, 128GB Storage)",
+                price: 79.99,
+                rating: 4.5,
+                image: "https://m.media-amazon.com/images/I/41p5+sHnRvL._SY300_SX300_.jpg",
+                Featured:true
+            },
+            {
+                id: 2,
+                title: "Wheat Dinner Plate | Eco-Friendly, Lightweight & Unbreakable",
+                price: 499.99,
+                rating: 4.8,
+                image: "https://m.media-amazon.com/images/I/31oeumiDK7L._SX300_SY300_QL70_FMwebp_.jpg",
+                Featured:true
+            },
+
+            {
+                id: 4,
+                title: "Sunfeast Dark Fantasy Dark Fantasy Choco Fills, 300g",
+                price: 129.99,
+                rating: 4.6,
+                image: "https://m.media-amazon.com/images/I/51HDRdNLU-L._SX300_SY300_QL70_FMwebp_.jpg",
+                Featured:true
+            },
+            {
+                id: 3,
+                title: "Round Coffee Table 2-Tier Corner Table",
+                price: 39.99,
+                rating: 4.3,
+                image: "https://m.media-amazon.com/images/I/51P6QWcja4L._SX300_SY300_QL70_FMwebp_.jpg",
+                Featured:true
+            },
+            {
+                id: 5,
+                title: "Dumbbell Weight Set Of 2, 5 Kg,Black",
+                price: 49.99,
+                rating: 4.7,
+                image: "https://m.media-amazon.com/images/I/31R1LXczAqL._SX300_SY300_QL70_FMwebp_.jpg",
+                Featured:true
+            },
+            {
+                id: 6,
+                title: "Leriya Fashion Dress for Women | Loose Fit | Button-Down | Shirt Dress | 3/4 Sleeve",
+                price: 29.99,
+                rating: 4.4,
+                image: "https://m.media-amazon.com/images/I/51Q6gdK8LuL._SX679_.jpg",
+                Featured:true
+            }
+        ];
+
+        const trendingProducts = [
+            {
+                id: 7,
+                title: "Smart LED TV 43-inch",
+                price: 349.99,
+                rating: 4.6,
+                image: "https://m.media-amazon.com/images/I/41f203GxpSL._SY300_SX300_QL70_FMwebp_.jpg",
+                trendingt:true,
+            },
+            {
+                id: 8,
+                title: "Digital Camera with 4K Recording",
+                price: 599.99,
+                rating: 4.8,
+                image: "https://m.media-amazon.com/images/I/51sFWW4Hv3L._SX300_SY300_QL70_FMwebp_.jpg",
+                trendingt:true,
+            },
+            {
+                id: 9,
+                title: "Stainless Steel Water Bottle",
+                price: 19.99,
+                rating: 4.5,
+                image: "https://m.media-amazon.com/images/I/310RV-hFMiL._SX300_SY300_QL70_FMwebp_.jpg",
+                trendingt:true,
+            },
+            {
+                id: 10,
+                title: "Wireless Earbuds",
+                price: 89.99,
+                rating: 4.7,
+                image: "https://m.media-amazon.com/images/I/31gtxHHEj9L._SY300_SX300_.jpg",
+                trendingt:true,
+            },
+            {
+                id: 11,
+                title: "Fitness Tracker Band",
+                price: 59.99,
+                rating: 4.4,
+                image: "https://m.media-amazon.com/images/I/41qLqKu8+mL._SY300_SX300_.jpg",
+                trendingt:true,
+            },
+            {
+                id: 12,
+                title: "Smart Home Assistant",
+                price: 119.99,
+                rating: 4.9,
+                image: "https://m.media-amazon.com/images/I/41xbjUdWVoL._SY300_SX300_.jpg",
+                trendingt:true,
+            },
+            {
+                id: 12,
+                title: "MAGGI 2-Minute Instant Noodles,Masala Noodles With Goodness Of Iron, 840 g Pouch (Pack of 12, 70 g each)",
+                price: 119.99,
+                rating: 4.9,
+                image: "https://m.media-amazon.com/images/I/61Nge+2s2fL._SX679_PIbundle-12,TopRight,0,0_AA679SH20_.jpg",
+                trendingt:true,
+            }
+        ];
+
+      
+
+        // Function to display products
+        function displayProducts(productsList, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            productsList.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                // Create star rating HTML
+                const stars = '★'.repeat(Math.floor(product.rating)) + 
+                              (product.rating % 1 >= 0.5 ? '½' : '') + 
+                              '☆'.repeat(5 - Math.ceil(product.rating));
+                
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.title}">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.title}</h3>
+                        <div class="product-price">$${product.price.toFixed(2)}</div>
+                        <div class="product-rating">${stars} (${product.rating})</div>
+                        <button>Add to Cart</button>
+                    </div>
+                `;
+                
+                container.appendChild(productCard);
+            });
+        }
+
+        // Function to display categories
+        function displayCategories(categoriesList, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            categoriesList.forEach(category => {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'category-card';
+                
+                categoryCard.innerHTML = `
+                    <div class="category-image">
+                        <img src="${category.image}" alt="${category.title}">
+                    </div>
+                    <div class="category-title">${category.title}</div>
+                `;
+                
+                container.appendChild(categoryCard);
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            displayProducts(featuredProducts, 'featured-products');
+            displayProducts(trendingProducts, 'trending-products');
+            displayCategories(categories, 'categories');
+            
+            // Add event listeners for filter elements
+            const filterDropdowns = document.querySelectorAll('.filter-dropdown');
+            filterDropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', () => {
+                    // Here you would normally make API calls with the filter parameters
+                    // For now, we'll just log the values
+                    console.log('Filter changed:', dropdown.value);
+                    // You could implement sorting/filtering based on these values
+                });
+            });
+
+            // Simulate an API fetch (you'll replace this with real API calls)
+            console.log('Page loaded - in a real app, API data would be fetched here');
+            
+            // Event delegation for "Add to Cart" buttons
+            document.addEventListener('click', function(event) {
+                if (event.target.textContent === 'Add to Cart') {
+                    const productCard = event.target.closest('.product-card');
+                    const productTitle = productCard.querySelector('.product-title').textContent;
+                    console.log(`Added to cart: ${productTitle}`);
+                    // Here you would make an API call to add the item to the cart
+                }
+            });
+        });
+    </script>
+</body>
+</html>
