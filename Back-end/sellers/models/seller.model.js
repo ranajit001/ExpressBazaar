@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { type } from "os";
 
 
-const buuyerSchema = new mongoose.Schema({
+
+const sellerSchema = new mongoose.Schema({
     name:{
         type:String,
         require:true,
@@ -24,5 +24,5 @@ const buuyerSchema = new mongoose.Schema({
     }
 });
 
-export const sellerModel = mongoose.model('selleruser',buyerModel);
+export const sellerModel = mongoose.model('selleruser',sellerSchema);
  

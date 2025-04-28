@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpressBazaar - Search Results</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+       
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="top-header">
+            <a href="index.html" class="logo">Express<span>Bazaar</span></a>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search for products, brands and more">
+                <button id="search-button">Search</button>
+            </div>
+            <div class="user-actions">
+                <a href="#">Login</a>
+                <a href="#">Cart</a>
+            </div>
+        </div>
+        <nav>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="#">Electronics</a>
+                <a href="#">Fashion</a>
+                <a href="#">Home & Kitchen</a>
+                <a href="#">Books</a>
+                <a href="#">Sports & Outdoors</a>
+                <a href="#">Beauty</a>
+                <a href="#">Toys & Games</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Search Results Section -->
+    <main class="search-container">
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar">
+            <div class="filter-section">
+                <h3>Categories</h3>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="category" value="electronics"> Electronics
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="category" value="fashion"> Fashion
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="category" value="home-kitchen"> Home & Kitchen
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="category" value="books"> Books
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="category" value="sports"> Sports & Outdoors
+                    </label>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>Brand</h3>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="brand" value="samsung"> Samsung
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="brand" value="apple"> Apple
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="brand" value="sony"> Sony
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="brand" value="nike"> Nike
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="brand" value="adidas"> Adidas
+                    </label>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>Price Range</h3>
+                <div class="price-range">
+                    <div class="price-inputs">
+                        <input type="number" id="min-price" placeholder="Min" min="0">
+                        <input type="number" id="max-price" placeholder="Max" min="0">
+                        <button id="price-filter-btn">Go</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>Customer Rating</h3>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="rating" value="4-up"> 4★ & above
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="rating" value="3-up"> 3★ & above
+                    </label>
+                </div>
+                <div class="filter-option">
+                    <label>
+                        <input type="checkbox" name="rating" value="2-up"> 2★ & above
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Results Content -->
+        <div class="results-content">
+            <div class="results-header">
+                <div id="results-count" class="results-count">Showing results for: "<span id="search-term"></span>"</div>
+                <div class="sort-options">
+                    <label for="sort-select">Sort By:</label>
+                    <select id="sort-select">
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                        <option value="rating_desc">Rating: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading search results...</p>
+            </div>
+
+            <!-- No Results Message (initially hidden) -->
+            <div id="no-results" class="no-results" style="display: none;">
+                <h2>No products found for "<span class="search-term-placeholder"></span>"</h2>
+                <p>Try different keywords or browse our categories.</p>
+            </div>
+
+            <!-- Results Grid (initially hidden) -->
+            <div id="results-grid" class="results-grid" style="display: none;">
+                <!-- Products will be dynamically added here -->
+            </div>
+
+            <!-- Pagination (initially hidden) -->
+            <div id="pagination" class="pagination" style="display: none;">
+                <!-- Pagination links will be dynamically added here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Get to Know Us</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press Releases</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Make Money with Us</h3>
+                <ul>
+                    <li><a href="#">Sell on ExpressBazaar</a></li>
+                    <li><a href="#">Become an Affiliate</a></li>
+                    <li><a href="#">Advertise Your Products</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Customer Service</h3>
+                <ul>
+                    <li><a href="#">Returns & Replacements</a></li>
+                    <li><a href="#">Shipping Rates & Policies</a></li>
+                    <li><a href="#">Help Center</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 ExpressBazaar. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

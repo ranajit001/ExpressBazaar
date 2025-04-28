@@ -1,7 +1,8 @@
 
 import { ProductModel } from "../models/product.model.js";
 
-
+import cloudinary from '../../configs/cloudinary.config.js'
+import fs from 'fs';
 
 
 
@@ -46,18 +47,54 @@ export const newProduct_seller = async (req,res) => {
        const {title,brand,price,keywords,image} = req.body;
        if(!title || !price || !brand || !keywords || !image)
                     return res.status(400).json({message:'please provide all details...'})
-        req.body.sellerName = req.user.name;
-        req.body.sellerId =  req.user.id;
 
-    const prod = await ProductModel.create(req.body)
-    res.status(200).json(prod)
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'At least one image must be uploaded.' });
+          }
+
+              // Step 1: Upload all images to Cloudinary
+    const imageUploadPromises = req.files.map((file) =>
+        cloudinary.uploader.upload(file.path, { folder: "Products" }) // optional folder
+      );
+  
+      const uploadResults = await Promise.all(imageUploadPromises);
+  
+      // Step 2: Get all secure_urls
+      const imageUrls = uploadResults.map((result) => result.secure_url);
+  
+      // Step 3: Clean up local uploads folder
+      req.files.forEach((file) => fs.unlinkSync(file.path));
+
+     // Step 4: Prepare final product data
+     const productData = {
+        title,
+        brand,
+        price,
+        keywords,
+        description,
+        sellerName: req.user.name,
+        sellerId: req.user.id,
+        Image: imageUrls,   // <- Store array of URLs
+      };
+  
+      // Step 5: Save to database
+      const product = await ProductModel.create(productData);
+  
+      res.status(201).json(product);
+  
 
     } catch (error) {
         res.status(500).json({message:error.message})
     }
 };
 
-
+// seller_productRouter.post(
+//     '/create',
+//     upload.array('images', 5),  // for multiple images
+//     newProduct_seller
+//   );
+  
 
 
 export const updateProducts_seller = async (req, res) => {

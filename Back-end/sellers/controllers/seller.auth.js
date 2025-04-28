@@ -1,4 +1,4 @@
-import { buyerModel } from "../models/buyer.model.js";
+import { sellerModel } from '../models/seller.model.js';
 import argon2 from 'argon2'
 import jwt from 'jsonwebtoken';
 import { configDotenv } from "dotenv";
@@ -16,11 +16,11 @@ const generateToken = (user) =>
 export const signup = async (req,res) => {
    try {
     const {email,password}= req.body
-    const user = await buyerModel.findOne({email})
+    const user = await sellerModel.findOne({email})
     if(user) return res.status(409).json({message:'user already exists...'})
         const hash = argon2.hash(password)
 
-   await buyerModel.create({...req.body,password:hash})
+   await sellerModel.create({...req.body,password:hash})
     res.sendStatus(201)
    } catch (error) {
     res.status(500).json({message:'server error while signup...'})
@@ -32,7 +32,7 @@ export const signup = async (req,res) => {
 export const login = async (req,res) => {
     try {
         const {email,password}= req.body;
-        const user = await buyerModel.findOne({email});
+        const user = await sellerModel.findOne({email});
         if(!user) return res.status(404).json({message:'user not exists... please signup...'})
 
             const verified = argon2.verify(user.password,password)

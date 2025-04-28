@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create New Product</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+      color: #555;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover:enabled {
+      background-color: #45a049;
+    }
+
+    button:disabled {
+      background-color: #9e9e9e;
+      cursor: not-allowed;
+    }
+
+    #preview {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #preview img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    #message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #spinner {
+      display: none;
+      margin: 0 auto;
+      margin-bottom: 15px;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #ccc;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Create New Product</h1>
+
+    <div id="spinner"></div>
+
+    <form id="productForm" enctype="multipart/form-data">
+
+      <label for="title">Product Title:</label>
+      <input type="text" id="title" name="title" required>
+
+      <label for="brand">Brand:</label>
+      <input type="text" id="brand" name="brand" required>
+
+      <label for="price">Price:</label>
+      <input type="number" id="price" name="price" required>
+
+      <label for="keywords">Keywords:</label>
+      <input type="text" id="keywords" name="keywords" required>
+
+      <label for="description">Description:</label>
+      <textarea id="description" name="description" rows="4" required></textarea>
+
+      <label for="images">Product Images:</label>
+      <input type="file" id="images" name="images" multiple accept="image/*" required>
+
+      <div id="preview"></div>
+
+      <button type="submit" id="submitBtn">Create Product</button>
+
+    </form>
+
+    <div id="message"></div>
+
+  </div>
+
+  <script>
+    const form = document.getElementById('productForm');
+    const imagesInput = document.getElementById('images');
+    const previewContainer = document.getElementById('preview');
+    const spinner = document.getElementById('spinner');
+    const message = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    imagesInput.addEventListener('change', () => {
+      previewContainer.innerHTML = '';
+      const files = imagesInput.files;
+      for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(files[i]);
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      spinner.style.display = 'block'; // show spinner
+      submitBtn.disabled = true;       // disable button
+      message.textContent = '';         // clear previous message
+
+      try {
+        const response = await fetch('http://localhost:5000/seller/products/create', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Something went wrong!');
+        }
+
+        spinner.style.display = 'none';
+        message.style.color = 'green';
+        message.textContent = '🎉 Product successfully created!';
+        form.reset();
+        previewContainer.innerHTML = '';
+
+      } catch (error) {
+        spinner.style.display = 'none';
+        message.style.color = 'red';
+        message.textContent = `❌ ${error.message}`;
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

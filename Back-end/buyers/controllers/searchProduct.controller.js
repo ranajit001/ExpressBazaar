@@ -1,8 +1,7 @@
 import { ProductModel } from "../../sellers/models/product.model.js";
-import { buyerModel } from "../models/buyer.model.js";
 import { cartModel } from "../models/cart.model.js";
 
-const getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res) => {
 
     //search by id
     const id = req.params.id;
@@ -59,7 +58,7 @@ const getAllProducts = async (req, res) => {
 
 
 
-  const addtoCart = async (req, res) => {
+ export  const addtoCart = async (req, res) => {
     try {
       const productId = req.params.id;
       const buyerId = req.user.id;
@@ -95,10 +94,40 @@ const getAllProducts = async (req, res) => {
   };
   
 
-  const removefromCart = async (req,res) => {
+
+
+
+ export  const removefromCart = async (req, res) => {
     try {
-      
+      const productId = req.params.id;
+      if (!productId) return res.sendStatus(400);
+  
+      const cart = await cartModel.findOne({ buyerId: req.user.id });
+  
+      if (!cart) return res.sendStatus(404); // cart not found
+  
+      const productIndex = cart.products.findIndex(
+        (item) => item.product.toString() === productId
+      );
+  
+      if (productIndex === -1) {
+        return res.status(404).json({ message: "Product not found in cart" });
+      }
+  
+      if (cart.products[productIndex].quantity > 1) {
+        // If quantity > 1, reduce quantity by 1
+        cart.products[productIndex].quantity -= 1;
+      } else {
+        // If quantity == 1, remove the product
+        cart.products.splice(productIndex, 1);
+      }
+  
+      await cart.save();
+  
+      res.status(200).json(cart);
     } catch (error) {
-      
+      console.error(error);
+      res.status(500).json({ message: error.message });
     }
-  }
+  };
+  
