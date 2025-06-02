@@ -167,14 +167,12 @@ async function filterFetch(){ // called from displaybrand display category, top 
 
 
 
-
-
-
 // Function to display results
      function displayProduct(products) {
        products =  products ? products : allProducts
         loadingElement.style.display = 'none';
-
+        console.log(products);
+        
         // Check if there are products
         if (!products|| products.length === 0) {
             noResultsElement.style.display = 'block';
@@ -203,8 +201,11 @@ async function filterFetch(){ // called from displaybrand display category, top 
                 (hasHalfStar ? '½' : '') +
                 '☆'.repeat(emptyStars);
 
-            // Handle image URL
-            let imageUrl = product.images[0] ? product.image[0] :`https://media.newyorker.com/photos/62c4511e47222e61f46c2daa/master/w_1920,c_limit/shouts-animals-watch-baby-hemingway.jpg`
+            // Handle image URL - Fixed version
+            let imageUrl = product.images && product.images.length > 0 
+                ? product.images[0] 
+                : 'https://media.newyorker.com/photos/62c4511e47222e61f46c2daa/master/w_1920,c_limit/shouts-animals-watch-baby-hemingway.jpg';
+
             // Add HTML for product card
             productCard.innerHTML = `
                 <div class="product-image">
@@ -244,7 +245,6 @@ function displayBrands(brands){
 };
 
 
-
 function displayCategory(category){
     category = category ? category : allcategories;
     all_catagory_filter.innerHTML = ''
@@ -259,8 +259,6 @@ function displayCategory(category){
         all_catagory_filter.appendChild(label);
     });
 }
-
-
 
 
 
