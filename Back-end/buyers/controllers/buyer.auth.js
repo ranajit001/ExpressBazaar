@@ -15,7 +15,8 @@ const generateToken = (user) =>
 
 export const signup = async (req,res) => {
    try {
-    const {name,email,password}= req.body;
+    const {name,email,password}= req.body; console.log('buyer signing in');
+    
     if(!name || !email || !password) return res.status(400).json({message:'All fields are required...'})
     const user = await buyerModel.findOne({email})
     if(user) return res.status(409).json({message:'user already exists...'})
@@ -32,7 +33,8 @@ export const signup = async (req,res) => {
 
 export const login = async (req,res) => {
     try {
-        const {email,password}= req.body;
+        const {email,password}= req.body; console.log('buyer logging in');
+        
             if( !email || !password) return res.status(400).json({message:'All fields are required...'})
         const user = await buyerModel.findOne({email});
         if(!user) return res.status(404).json({message:'user not exists... please signup...'})
