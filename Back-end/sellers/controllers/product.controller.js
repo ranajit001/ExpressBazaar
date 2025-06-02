@@ -1,4 +1,3 @@
-
 import { ProductModel } from "../models/product.model.js";
 
 import cloudinary from '../../configs/cloudinary.config.js'
@@ -6,10 +5,13 @@ import fs from 'fs';
 
 
 
-export const getproduct_seller =async (req, res) => {  
+export const getproduct_seller = async (req, res) => {
   const id = req.params.id;
-    // console.log('hiiiiiiiiiiiiiiiiii');
-    
+  
+  // Add debugging
+  // console.log('User in request:', req.user);
+  // console.log('Seller ID:', req.user?.id);
+
   try {
     // 0. Return single product by ID
     if (id) {
@@ -18,6 +20,19 @@ export const getproduct_seller =async (req, res) => {
     }
 
     let aggregationPipeline = [];
+
+    // Modified seller matching to handle potential undefined sellerId
+    if (!req.user?.id) {
+      return res.status(400).json({ message: 'Seller ID not found in request' });
+    }
+
+    // Convert string ID to ObjectId if needed
+    // aggregationPipeline.push({ 
+    //   $match: { 
+    //     sellerId: req.user.id.toString() 
+    //   } 
+    // });
+
     const {
       search: search_keyword,
       brands,
@@ -31,27 +46,26 @@ export const getproduct_seller =async (req, res) => {
       limit = 25,
     } = req.query;
 
-    // 1. Search keyword
-    if (search_keyword && search_keyword.length>0) {
-      const searchFilter = {
-        $or: [
-          { title: { $regex: search_keyword, $options: 'i' } },
-          { description: { $regex: search_keyword, $options: 'i' } },
-          { tags: { $elemMatch: { $regex: search_keyword, $options: 'i' } } },
-          { brand: search_keyword },
-          { category: search_keyword },
-        ],
-        sellerId:req.user.id
-      };
-      aggregationPipeline.push({ $match: searchFilter });
+    // 1. Search keyword (optional)
+    if (search_keyword && search_keyword.length > 0) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            { title: { $regex: search_keyword, $options: 'i' } },
+            { description: { $regex: search_keyword, $options: 'i' } },
+            { tags: { $elemMatch: { $regex: search_keyword, $options: 'i' } } },
+            { brand: search_keyword },
+            { category: search_keyword },
+          ]
+        }
+      });
     }
 
     // 2. Brand/Category filters
     const andConditions = [];
 
     if (brands) {
-      let brandList = []
-      brandList = brands.split(','); 
+      const brandList = brands.split(',');
       andConditions.push({ brand: { $in: brandList } });
     }
 
@@ -75,12 +89,12 @@ export const getproduct_seller =async (req, res) => {
       aggregationPipeline.push({ $match: priceFilter });
     }
 
-    // 4. Rating filter (expects ratings as comma-separated values)
+    // 4. Rating filter
     if (rating) {
       aggregationPipeline.push({ $match: { rating: { $gte: +rating.trim() } } });
     }
 
-    // ✅ Save pre-pagination pipeline for brand/category filter counts
+    // ✅ Save base filter for brand/category aggregation
     const baseFilterPipeline = [...aggregationPipeline];
 
     // 5. Sorting
@@ -90,15 +104,15 @@ export const getproduct_seller =async (req, res) => {
     // 6. Pagination
     // const skip = (parseInt(page) - 1) * parseInt(limit);
     // aggregationPipeline.push({ $skip: skip });
-    // aggregationPipeline.push({ $limit: parseInt(limit +1) });
+    // aggregationPipeline.push({ $limit: parseInt(limit) + 1 }); // +1 to check if more exists
 
-    // 7. Fetch final filtered products
-    const products = await ProductModel.aggregate(aggregationPipeline); 
-    
-    const hasMoreItems =products.length == limit +1 ? true:false;  // to checkme idf thre is more product pagination or not 
-    if(hasMoreItems)products.pop(); //to maintain limit;
+    // 7. Fetch filtered products
+    const products = await ProductModel.aggregate(aggregationPipeline);
 
-    // 8. Fetch available brands/categories in current filtered set
+    const hasMoreItems = products.length === parseInt(limit) + 1;
+    if (hasMoreItems) products.pop(); // maintain the exact limit
+
+    // 8. Fetch available brands/categories in filtered set
     const brandsData = await ProductModel.aggregate([
       ...baseFilterPipeline,
       { $group: { _id: '$brand' } },
@@ -115,17 +129,18 @@ export const getproduct_seller =async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Products fetched successfully',
-      products,
+      products:products.filter(e=>e.sellerId == req.user.id),
       brands: brandsData.map(b => b.brand),
       categories: categoriesData.map(c => c.category),
       hasMoreItems
     });
 
   } catch (error) {
-    console.error(error,'seller get prod');
+    console.error(error, 'seller get prod');
     res.status(500).json({ message: 'Failed to fetch products', error: error.message });
   }
 };
+
 
 
 

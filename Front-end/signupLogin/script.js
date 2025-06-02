@@ -122,7 +122,7 @@ loginForm.addEventListener("submit", async (e) => {
             
             // Redirect after success message
             setTimeout(() => {
-                window.location.href = '../home Page/index.html';
+                window.location.href = '../index.html';
             }, 1500);
         } else {
             showMessage(data.message || "Login failed!", "error");
