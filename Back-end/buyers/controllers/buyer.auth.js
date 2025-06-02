@@ -8,20 +8,21 @@ const generateToken = (user) =>
     jwt.sign(
       { id: user._id, role: user.role, email: user.email },
       process.env.jwt,
-      { algorithm: 'RS256', expiresIn: '15d' }
+      {  expiresIn: '15d' }
     );
   
 
 
 export const signup = async (req,res) => {
    try {
-    const {email,password}= req.body
+    const {name,email,password}= req.body;
+    if(!name || !email || !password) return res.status(400).json({message:'All fields are required...'})
     const user = await buyerModel.findOne({email})
     if(user) return res.status(409).json({message:'user already exists...'})
-        const hash = argon2.hash(password)
+        const hash = await argon2.hash(password)
 
    await buyerModel.create({...req.body,password:hash})
-    res.sendStatus(201)
+    res.status(200).json({message:'created'})
    } catch (error) {
     res.status(500).json({message:'server error while signup...'})
     console.log(error);
@@ -32,6 +33,7 @@ export const signup = async (req,res) => {
 export const login = async (req,res) => {
     try {
         const {email,password}= req.body;
+            if( !email || !password) return res.status(400).json({message:'All fields are required...'})
         const user = await buyerModel.findOne({email});
         if(!user) return res.status(404).json({message:'user not exists... please signup...'})
 

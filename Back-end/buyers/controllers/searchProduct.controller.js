@@ -1,60 +1,124 @@
 import { ProductModel } from "../../sellers/models/product.model.js";
 import { cartModel } from "../models/cart.model.js";
 
-export const getAllProducts = async (req, res) => {
 
-    //search by id
-    const id = req.params.id;
-    try {
+export const getAllProducts = async (req, res) => {  
+  const id = req.params.id;
 
-        if(id){
-            const product = await ProductModel.findById(id)
-            if(product) return res.status(200).json(product)
-        }
-      // 1. Search Filter
-      let searchFilter = {};
-  
-      if (req.query.search) {
-        const keyword = req.query.search;
-        searchFilter = {
-          $or:[
-            { title:{$regex:search_keyword, $options: 'i'}},
-            {brand:{$regex:search_keyword, $options: 'i'}},
-            {description:{$regex:search_keyword, $options: 'i'}},
-            {price:{$regex:search_keyword, $options: 'i'}},
-            {keywords:{$regex:search_keyword, $options: 'i'}},
-         ]
-        };
-      }
-  
-
-      const {page = '1',limit = '50',sort = 'price',order = 'asc'} = req.query;
-
-      // 2. Sort Option
-      let sortOption = {[sort]:order== 'asc'? 1:-1};
-
-      // 3. Pagination
-      const skip = (page - 1) * limit; //now skip is a number here
-  
-      // 4. Fetch products
-      const products = await ProductModel.find(searchFilter)
-        .sort(sortOption)
-        .skip(+skip)
-        .limit(+limit);
-  
-        res.status(200).json({
-            success: true,
-            message: "Product fetched successfully",
-            products
-          });
-          
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch products", error: error.message });
-      console.log(error);
-      
+  try {
+    // 0. Return single product by ID
+    if (id) {
+      const product = await ProductModel.findById(id);
+      if (product) return res.status(200).json(product);
     }
-  };
-  
+
+    let aggregationPipeline = [];
+    const {
+      search: search_keyword,
+      brands,
+      categories,
+      minPrice,
+      maxPrice,
+      rating,
+      sort = 'price',
+      order = 'asc',
+      page = 1,
+      limit = 25,
+    } = req.query;
+
+    // 1. Search keyword
+    if (search_keyword.length>0) {
+      const searchFilter = {
+        $or: [
+          { title: { $regex: search_keyword, $options: 'i' } },
+          { description: { $regex: search_keyword, $options: 'i' } },
+          { tags: { $elemMatch: { $regex: search_keyword, $options: 'i' } } },
+          { brand: search_keyword },
+          { category: search_keyword },
+        ]
+      };
+      aggregationPipeline.push({ $match: searchFilter });
+    }
+
+    // 2. Brand/Category filters
+    const andConditions = [];
+
+    if (brands) {
+      let brandList = []
+      brandList = brands.split(','); 
+      andConditions.push({ brand: { $in: brandList } });
+    }
+
+    if (categories) {
+      const categoryList = categories.split(',');
+      andConditions.push({ category: { $in: categoryList } });
+    }
+
+    if (andConditions.length > 0) {
+      aggregationPipeline.push({ $match: { $and: andConditions } });
+    }
+
+    // 3. Price filter
+    if (minPrice || maxPrice) {
+      const priceFilter = {
+        price: {
+          ...(minPrice && { $gte: parseFloat(minPrice) }),
+          ...(maxPrice && { $lte: parseFloat(maxPrice) }),
+        }
+      };
+      aggregationPipeline.push({ $match: priceFilter });
+    }
+
+    // 4. Rating filter (expects ratings as comma-separated values)
+    if (rating) {
+      aggregationPipeline.push({ $match: { rating: { $gte: +rating.trim() } } });
+    }
+
+    // ✅ Save pre-pagination pipeline for brand/category filter counts
+    const baseFilterPipeline = [...aggregationPipeline];
+
+    // 5. Sorting
+    const sortOption = order === 'asc' ? 1 : -1;
+    aggregationPipeline.push({ $sort: { [sort]: sortOption } });
+
+    // 6. Pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    aggregationPipeline.push({ $skip: skip });
+    aggregationPipeline.push({ $limit: parseInt(limit +1) });
+
+    // 7. Fetch final filtered products
+    const products = await ProductModel.aggregate(aggregationPipeline);
+    const hasMoreItems =products.length == limit +1 ? true:false;  // to checkme idf thre is more product pagination or not 
+    if(hasMoreItems)products.pop(); //to maintain limit;
+
+    // 8. Fetch available brands/categories in current filtered set
+    const brandsData = await ProductModel.aggregate([
+      ...baseFilterPipeline,
+      { $group: { _id: '$brand' } },
+      { $project: { brand: '$_id', _id: 0 } }
+    ]);
+
+    const categoriesData = await ProductModel.aggregate([
+      ...baseFilterPipeline,
+      { $group: { _id: '$category' } },
+      { $project: { category: '$_id', _id: 0 } }
+    ]);
+
+    // 9. Send response
+    res.status(200).json({
+      success: true,
+      message: 'Products fetched successfully',
+      products,
+      brands: brandsData.map(b => b.brand),
+      categories: categoriesData.map(c => c.category),
+      hasMoreItems
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+  }
+};
 
 
 
@@ -62,7 +126,7 @@ export const getAllProducts = async (req, res) => {
     try {
       const productId = req.params.id;
       const buyerId = req.user.id;
-      if (!productId) return res.sendStatus(400);
+      if (!productId) return res.status(400).json({message:'no product selected...'});
   
       let cart = await cartModel.findOne({ buyerId });
   

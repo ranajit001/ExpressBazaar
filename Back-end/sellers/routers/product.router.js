@@ -4,7 +4,8 @@ import { Router } from "express";
 export const sellerRouter = Router()
 
 
-sellerRouter.post('/signup',signup)
+sellerRouter
+.post('/signup',signup)
 .post('/login',login);
 
 
@@ -26,7 +27,7 @@ sellerRouter
 .use(seller_roleBased(['seller']))
 
 .post('/create',upload.array('images', 5),newProduct_seller)
-.get(['/','/:id'],getproduct_seller)
+.get(['/products','/products/:id'],getproduct_seller)
 .patch(['/update','/update/:id'],updateProducts_seller)
 .delete(['/delete/:id','/delete'],deleteProduct_seller)
 

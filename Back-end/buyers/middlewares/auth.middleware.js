@@ -7,7 +7,7 @@ export const roleBased = (roles) => (req, res, next) => {
   if (!token) return res.status(401).json({ message: "token not found..." });
 
   try {
-    const decoded = jwt.verify(token, process.env.jwtsecret);
+    const decoded = jwt.verify(token, process.env.jwt);
     if (decoded) {
       req.user = decoded;
       if (roles.includes(decoded.role)) next();

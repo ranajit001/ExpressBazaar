@@ -6,46 +6,135 @@ import fs from 'fs';
 
 
 
-export const getproduct_seller = async (req,res) => {
-    const id = req.params.id;
-    try {
-        if(id){
-           const prod =  await ProductModel.findById(id);
-          return res.status(200).json(prod)
-        };
-
-        let searchobj = null;
-        const search_keyword = req.query.search;
-        searchobj ={
-            $or:[
-               { title:{$regex:search_keyword, $options: 'i'}},
-               {brand:{$regex:search_keyword, $options: 'i'}},
-               {description:{$regex:search_keyword, $options: 'i'}},
-               {price:{$regex:search_keyword, $options: 'i'}},
-               {keywords:{$regex:search_keyword, $options: 'i'}},
-            ] ,     sellerId:req.user.id   //must have to add it thats why outsode or oper.
-        };
-
-        const sortObj ={}
-            const{sort,order,page = 1,limit= 50} = req.query;
-            if(sort) sortObj[sort] = order== 'dec' ? -1 : 1 
-            const skip = (page - 1) * limit; //now skip is a number here
-
-
-        const prods = await ProductModel.find(searchobj).sort(sortObj).skip(skip).limit(limit);
-        res.status(200).json(prods)
-    } catch (e) {
-        res.status(500).json({message:'server error...'})
+export const getproduct_seller =async (req, res) => {  
+  const id = req.params.id;
+    // console.log('hiiiiiiiiiiiiiiiiii');
+    
+  try {
+    // 0. Return single product by ID
+    if (id) {
+      const product = await ProductModel.findById(id);
+      if (product) return res.status(200).json(product);
     }
+
+    let aggregationPipeline = [];
+    const {
+      search: search_keyword,
+      brands,
+      categories,
+      minPrice,
+      maxPrice,
+      rating,
+      sort = 'price',
+      order = 'asc',
+      page = 1,
+      limit = 25,
+    } = req.query;
+
+    // 1. Search keyword
+    if (search_keyword && search_keyword.length>0) {
+      const searchFilter = {
+        $or: [
+          { title: { $regex: search_keyword, $options: 'i' } },
+          { description: { $regex: search_keyword, $options: 'i' } },
+          { tags: { $elemMatch: { $regex: search_keyword, $options: 'i' } } },
+          { brand: search_keyword },
+          { category: search_keyword },
+        ],
+        sellerId:req.user.id
+      };
+      aggregationPipeline.push({ $match: searchFilter });
+    }
+
+    // 2. Brand/Category filters
+    const andConditions = [];
+
+    if (brands) {
+      let brandList = []
+      brandList = brands.split(','); 
+      andConditions.push({ brand: { $in: brandList } });
+    }
+
+    if (categories) {
+      const categoryList = categories.split(',');
+      andConditions.push({ category: { $in: categoryList } });
+    }
+
+    if (andConditions.length > 0) {
+      aggregationPipeline.push({ $match: { $and: andConditions } });
+    }
+
+    // 3. Price filter
+    if (minPrice || maxPrice) {
+      const priceFilter = {
+        price: {
+          ...(minPrice && { $gte: parseFloat(minPrice) }),
+          ...(maxPrice && { $lte: parseFloat(maxPrice) }),
+        }
+      };
+      aggregationPipeline.push({ $match: priceFilter });
+    }
+
+    // 4. Rating filter (expects ratings as comma-separated values)
+    if (rating) {
+      aggregationPipeline.push({ $match: { rating: { $gte: +rating.trim() } } });
+    }
+
+    // ✅ Save pre-pagination pipeline for brand/category filter counts
+    const baseFilterPipeline = [...aggregationPipeline];
+
+    // 5. Sorting
+    const sortOption = order === 'asc' ? 1 : -1;
+    aggregationPipeline.push({ $sort: { [sort]: sortOption } });
+
+    // 6. Pagination
+    // const skip = (parseInt(page) - 1) * parseInt(limit);
+    // aggregationPipeline.push({ $skip: skip });
+    // aggregationPipeline.push({ $limit: parseInt(limit +1) });
+
+    // 7. Fetch final filtered products
+    const products = await ProductModel.aggregate(aggregationPipeline); 
+    
+    const hasMoreItems =products.length == limit +1 ? true:false;  // to checkme idf thre is more product pagination or not 
+    if(hasMoreItems)products.pop(); //to maintain limit;
+
+    // 8. Fetch available brands/categories in current filtered set
+    const brandsData = await ProductModel.aggregate([
+      ...baseFilterPipeline,
+      { $group: { _id: '$brand' } },
+      { $project: { brand: '$_id', _id: 0 } }
+    ]);
+
+    const categoriesData = await ProductModel.aggregate([
+      ...baseFilterPipeline,
+      { $group: { _id: '$category' } },
+      { $project: { category: '$_id', _id: 0 } }
+    ]);
+
+    // 9. Send response
+    res.status(200).json({
+      success: true,
+      message: 'Products fetched successfully',
+      products,
+      brands: brandsData.map(b => b.brand),
+      categories: categoriesData.map(c => c.category),
+      hasMoreItems
+    });
+
+  } catch (error) {
+    console.error(error,'seller get prod');
+    res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+  }
 };
 
 
 
 
-export const newProduct_seller = async (req,res) => {
+export const newProduct_seller = async (req,res) => { 
+
     try {
-       const {title,brand,price,keywords,image} = req.body;
-       if(!title || !price || !brand || !keywords || !image)
+const { title, brand, price, tags, category, description,stock } = req.body;
+       if(!title || !price || !brand || tags.length==0  || !category)
                     return res.status(400).json({message:'please provide all details...'})
 
 
@@ -57,11 +146,13 @@ export const newProduct_seller = async (req,res) => {
     const imageUploadPromises = req.files.map((file) =>
         cloudinary.uploader.upload(file.path, { folder: "Products" }) // optional folder
       );
+  console.log(imageUploadPromises);
   
       const uploadResults = await Promise.all(imageUploadPromises);
   
       // Step 2: Get all secure_urls
       const imageUrls = uploadResults.map((result) => result.secure_url);
+
   
       // Step 3: Clean up local uploads folder
       req.files.forEach((file) => fs.unlinkSync(file.path));
@@ -71,20 +162,25 @@ export const newProduct_seller = async (req,res) => {
         title,
         brand,
         price,
-        keywords,
+        category,
+        tags,
         description,
         sellerName: req.user.name,
         sellerId: req.user.id,
-        Image: imageUrls,   // <- Store array of URLs
+        images: imageUrls,   // <- Store array of URLs
+        stock
       };
-  
+      console.log(productData);
+      
       // Step 5: Save to database
-      const product = await ProductModel.create(productData);
+      const product = await ProductModel.create(productData); 
+      
   
       res.status(201).json(product);
   
 
-    } catch (error) {
+    } catch (error) { console.log(error);
+    
         res.status(500).json({message:error.message})
     }
 };
@@ -96,14 +192,15 @@ export const newProduct_seller = async (req,res) => {
 //   );
   
 
-
+// data to select prodct will come through query and what need to update will code through body.
 export const updateProducts_seller = async (req, res) => {
          const id = req.params.id;
-    try {
+    try {console.log(req.body);
+    
 
             if(id){
-                await ProductModel.findByIdAndUpdate(id,req.body,{runValidators:true})
-                return res.sendStatus(200)
+                const prod = await ProductModel.findByIdAndUpdate(id,req.body,{runValidators:true,new:true})
+                return res.status(200).json(prod)
             }
 
 
@@ -111,7 +208,7 @@ export const updateProducts_seller = async (req, res) => {
 
         // Loop through query params and dynamically build the filter
         for (let key in req.query) {
-            if (req.query[key]) {
+            if (req.query[key]) { // if value is not null or empty
                 filter[key] = { $regex: req.query[key], $options: 'i' }; // case-insensitive match
             }
         }
@@ -136,7 +233,7 @@ export const updateProducts_seller = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).json({ message: "Server error" });
     }
 };
@@ -154,17 +251,17 @@ export const deleteProduct_seller = async (req, res) => {
         // No ID, delete many based on query (req.body)
         const filter = { sellerId: req.user.id };
 
-        for (let key in req.body) {
-            if (req.body[key]) {
-                filter[key] = req.body[key];
-            }
+    for (let key in req.query) {
+        if (req.query[key]) filter[key] = req.query[key];
         }
+
 
         const deletedMany = await ProductModel.deleteMany(filter);
         if (deletedMany.deletedCount > 0) return res.sendStatus(200);
         else return res.sendStatus(404);
 
-    } catch (error) {
+    } catch (error) { console.log(error);
+    
         res.status(500).json({ message: error.message });
     }
 };

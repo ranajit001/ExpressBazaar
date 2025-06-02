@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - ExpressBazaar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="brand">Express<span>Bazaar</span></div>
+            <ul class="nav-links">
+                <li><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="../sellerproductPage/sellerProduct.html"><i class="fas fa-box"></i> Products ★</a></li>
+                <li><a href="#"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="../../signupLogin/signupOrlogin.html" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout⭐ </a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Revenue</h3>
+                    <div class="value" id="totalRevenue">₹0</div>
+                    <div class="change">+12.5% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Products Sold</h3>
+                    <div class="value" id="productsSold">0</div>
+                    <div class="change">+8.2% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Products</h3>
+                    <div class="value" id="activeProducts">0</div>
+                    <div class="change">+5.7% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Rating</h3>
+                    <div class="value" id="averageRating">0.0</div>
+                    <div class="change">+2.1% from last month</div>
+                </div>
+            </div>
+
+            <div class="recent-orders">
+                <h2>Recent Orders</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentOrdersTable">
+                        <!-- Orders will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

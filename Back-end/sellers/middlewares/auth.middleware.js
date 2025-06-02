@@ -3,11 +3,13 @@ import { config } from "dotenv";
 config();
 
 export const seller_roleBased = (roles) => (req, res, next) => {
+  // console.log(req.headers);
+  
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "token not found..." });
 
   try {
-    const decoded = jwt.verify(token, process.env.jwtsecret);
+    const decoded = jwt.verify(token, process.env.jwt);
     if (decoded) {
       req.user = decoded;
       if (roles.includes(decoded.role)) next();

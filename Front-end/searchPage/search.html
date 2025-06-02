@@ -4,28 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExpressBazaar - Search Results</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-       
-    </style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Header Section -->
+     
     <header>
         <div class="top-header">
-            <a href="index.html" class="logo">Express<span>Bazaar</span></a>
+            <a href="../home Page/index.html" class="logo">Express<span>Bazaar</span></a>
             <div class="search-bar">
                 <input type="text" id="search-input" placeholder="Search for products, brands and more">
                 <button id="search-button">Search</button>
             </div>
             <div class="user-actions">
-                <a href="#">Login</a>
+                <a href="../signupLogin/signupOrlogin.html">Login</a>
                 <a href="#">Cart</a>
             </div>
         </div>
         <nav>
             <div class="nav-links">
-                <a href="index.html">Home</a>
+                <a href="../home Page/index.html">Home</a>
                 <a href="#">Electronics</a>
                 <a href="#">Fashion</a>
                 <a href="#">Home & Kitchen</a>
@@ -41,63 +39,32 @@
     <main class="search-container">
         <!-- Filters Sidebar -->
         <aside class="filters-sidebar">
-            <div class="filter-section">
-                <h3>Categories</h3>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="category" value="electronics"> Electronics
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="category" value="fashion"> Fashion
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="category" value="home-kitchen"> Home & Kitchen
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="category" value="books"> Books
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="category" value="sports"> Sports & Outdoors
-                    </label>
+\
+
+            <!-- brands -->
+            <div class="filter-section brands">
+                <h3>Brand</h3>
+                <div class="filter-option" id="all_brand">
+                    <!-- <label>
+                        <input type="checkbox" name="brand" value="samsung"> Samsung
+                    </label> -->
+                    
                 </div>
             </div>
 
-            <div class="filter-section">
-                <h3>Brand</h3>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="brand" value="samsung"> Samsung
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="brand" value="apple"> Apple
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="brand" value="sony"> Sony
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="brand" value="nike"> Nike
-                    </label>
-                </div>
-                <div class="filter-option">
-                    <label>
-                        <input type="checkbox" name="brand" value="adidas"> Adidas
-                    </label>
+           
+            <!-- catagory -->
+            <div class="filter-section catagories">
+                <h3>Categories</h3>
+                <div class="filter-option" id="all_category">
+                    <!-- <label>
+                        <input type="checkbox" name="category" value="electronics"> Electronics
+                    </label> -->
                 </div>
             </div>
+
+
+
 
             <div class="filter-section">
                 <h3>Price Range</h3>
@@ -110,21 +77,21 @@
                 </div>
             </div>
 
-            <div class="filter-section">
+            <div class="filter-section" id="customer_rating">
                 <h3>Customer Rating</h3>
                 <div class="filter-option">
                     <label>
-                        <input type="checkbox" name="rating" value="4-up"> 4★ & above
+                        <input type="checkbox" name="rating" value="4"> 4★ & above
                     </label>
                 </div>
                 <div class="filter-option">
                     <label>
-                        <input type="checkbox" name="rating" value="3-up"> 3★ & above
+                        <input type="checkbox" name="rating" value="3"> 3★ & above
                     </label>
                 </div>
                 <div class="filter-option">
                     <label>
-                        <input type="checkbox" name="rating" value="2-up"> 2★ & above
+                        <input type="checkbox" name="rating" value="2"> 2★ & above
                     </label>
                 </div>
             </div>
@@ -202,5 +169,9 @@
             <p>&copy; 2025 ExpressBazaar. All Rights Reserved.</p>
         </div>
     </footer>
+
+
+    <script type="module" src="./search.js"></script>
 </body>
 </html>
+<!-- search-term-placeholder -->
