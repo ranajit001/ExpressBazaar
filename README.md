@@ -9,7 +9,7 @@ ExpressBazaar is a full-stack e-commerce platform enabling separate interfaces f
 Fullstack
 
 ## Deployed App
-- Frontend: [ExpressBazaar Client](https://friendly-capybara-9dd838.netlify.app/)
+- Frontend: [ExpressBazaar Client](https://rainbow-scone-e7b0c7.netlify.app/)
 - Backend: [ExpressBazaar API](https://expressbazaar.onrender.com)
 - Database: MongoDB Atlas
 
